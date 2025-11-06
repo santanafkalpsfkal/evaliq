@@ -1,0 +1,313 @@
+/* src/ui/components/layout/Footer.css */
+.app-footer {
+  background: linear-gradient(90deg, #001529 0%, #003a8c 100%);
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+  margin-top: auto;
+}
+
+/* Wave Effect */
+.footer-wave {
+  position: absolute;
+  top: -2px;
+  left: 0;
+  width: 100%;
+  height: 80px;
+  transform: rotate(180deg);
+}
+
+.wave-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.wave-fill {
+  fill: #f4f6f9;
+}
+
+/* Main Content */
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 80px 40px 30px 40px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Brand Section */
+.footer-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.logo-icon {
+  font-size: 32px;
+  background: linear-gradient(90deg, #001529 0%, #003a8c 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.brand-name {
+  color: #fff !important;
+  margin: 0 !important;
+  font-size: 28px !important;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.brand-tagline {
+  color: #a0aec0;
+  font-size: 14px;
+  line-height: 1.6;
+  max-width: 300px;
+}
+
+/* Social Links */
+.social-links {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.social-btn {
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 10px !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: #a0aec0 !important;
+  transition: all 0.3s ease !important;
+}
+
+.social-btn:hover {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  border-color: transparent !important;
+  color: #fff !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+}
+
+/* Footer Sections */
+.footer-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.section-title {
+  color: #fff !important;
+  font-size: 16px !important;
+  font-weight: 600;
+  margin-bottom: 8px !important;
+  position: relative;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 30px;
+  height: 2px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 2px;
+}
+
+.links-list {
+  width: 100%;
+}
+
+.footer-link {
+  color: #a0aec0 !important;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+}
+
+.footer-link:hover {
+  color: #667eea !important;
+  transform: translateX(8px);
+}
+
+.footer-link .anticon {
+  font-size: 12px;
+}
+
+/* Support Card */
+.support-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+}
+
+.support-text {
+  color: #a0aec0;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.support-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  border: none !important;
+  border-radius: 8px !important;
+  height: 40px;
+  font-weight: 500;
+  transition: all 0.3s ease !important;
+}
+
+.support-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+}
+
+/* Divider */
+.footer-divider {
+  background: rgba(255, 255, 255, 0.1) !important;
+  margin: 40px 0 24px 0 !important;
+}
+
+/* Bottom Section */
+.footer-bottom {
+  padding-top: 16px;
+}
+
+.copyright {
+  color: #718096 !important;
+  font-size: 14px;
+}
+
+.copyright strong {
+  color: #a0aec0;
+}
+
+.bottom-links {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.bottom-link {
+  color: #718096 !important;
+  font-size: 13px;
+  transition: color 0.3s ease;
+}
+
+.bottom-link:hover {
+  color: #667eea !important;
+}
+
+.made-with {
+  color: #718096 !important;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.heart-icon {
+  color: #e53e3e;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .footer-content {
+    padding: 60px 24px 20px 24px;
+  }
+
+  .footer-main {
+    text-align: center;
+  }
+
+  .brand-logo {
+    justify-content: center;
+  }
+
+  .brand-tagline {
+    max-width: 100%;
+  }
+
+  .social-links {
+    justify-content: center;
+  }
+
+  .bottom-links {
+    justify-content: center;
+    margin-top: 16px;
+  }
+
+  .footer-bottom .ant-row {
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer-content {
+    padding: 50px 16px 16px 16px;
+  }
+
+  .brand-name {
+    font-size: 24px !important;
+  }
+
+  .logo-icon {
+    font-size: 28px;
+  }
+
+  .social-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .support-card {
+    padding: 16px;
+  }
+}
+
+/* Glass morphism effect for modern look */
+.app-footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(102, 126, 234, 0.1) 0%,
+    rgba(118, 75, 162, 0.05) 100%
+  );
+  pointer-events: none;
+}

@@ -1,0 +1,146 @@
+/* src/ui/pages/Home.css */
+
+/* Header */
+.home-header {
+  background: linear-gradient(90deg, #001529 0%, #003a8c 100%);
+  padding: 20px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.home-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.home-content {
+  padding: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  flex: 1;
+  /* Añadimos padding inferior extra para separar del footer */
+  padding-bottom: 80px !important;
+}
+
+.home-card {
+  text-align: center;
+  border-radius: 12px;
+  border: 1px solid #e8e8e8;
+  transition: all 0.3s ease;
+  height: 100%;
+  padding: 20px;
+  background: #fff;
+  margin-bottom: 24px; /* Espacio adicional entre cards */
+}
+
+.home-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.home-icon {
+  font-size: 48px;
+  color: #667eea;
+  margin-bottom: 16px;
+}
+
+.admin-card {
+  border: 2px solid #f5222d;
+}
+
+.admin-card .home-icon {
+  color: #f5222d;
+}
+
+/* Botón del dropdown de usuario */
+.user-dropdown-btn {
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  padding: 4px 12px;
+  height: auto;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(6px);
+  transition: all 0.3s ease;
+}
+
+.user-dropdown-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Contenedor principal del Layout */
+.home-layout {
+  min-height: 100vh;
+  background: #f4f6f9;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Espaciado adicional para las rows */
+.home-content .ant-row {
+  margin-bottom: 40px; /* Más espacio entre filas de cards */
+}
+
+/* Espaciado específico para la última fila */
+.home-content .ant-row:last-child {
+  margin-bottom: 60px; /* Aún más espacio antes del footer */
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .home-header {
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px 24px;
+    text-align: center;
+  }
+  
+  .home-header-content {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .home-content {
+    padding: 24px;
+    padding-bottom: 60px !important; /* Menos espacio en móvil pero suficiente */
+  }
+
+  .home-card {
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  /* Menos espacio entre rows en móvil */
+  .home-content .ant-row {
+    margin-bottom: 24px;
+  }
+
+  .home-content .ant-row:last-child {
+    margin-bottom: 40px;
+  }
+}
+
+@media (max-width: 480px) {
+  .home-content {
+    padding: 16px;
+    padding-bottom: 50px !important;
+  }
+
+  .home-card {
+    margin-bottom: 12px;
+  }
+
+  .home-content .ant-row {
+    margin-bottom: 16px;
+  }
+
+  .home-content .ant-row:last-child {
+    margin-bottom: 30px;
+  }
+}

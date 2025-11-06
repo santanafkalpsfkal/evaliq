@@ -1,0 +1,89 @@
+/* src/ui/pages/Admin.css */
+
+/* Mismo estilo que el Home */
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 24px;
+  background: linear-gradient(90deg, #001529 0%, #003a8c 100%);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.admin-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+/* Títulos con el mismo estilo que el Home */
+.admin-header-content .ant-typography h3 {
+  color: #fff;
+  margin-bottom: 0;
+  font-size: 18px;
+}
+
+.admin-header-content .ant-typography span {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+}
+
+/* Botón del dropdown igual que en el Home */
+.user-dropdown-btn {
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  padding: 4px 12px;
+  height: auto;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(6px);
+  transition: all 0.3s ease;
+}
+
+.user-dropdown-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Contenido principal */
+.admin-content {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Tarjeta moderna con sombra y bordes redondeados */
+.admin-card {
+  width: 100%;
+  background: #fff;
+  border-radius: 10px;
+  padding: 24px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+/* Pequeña animación al pasar el mouse */
+.admin-card:hover {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .admin-header {
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+    text-align: center;
+  }
+  
+  .admin-header-content {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .admin-content {
+    padding: 16px;
+  }
+}

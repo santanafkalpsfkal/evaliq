@@ -1,0 +1,58 @@
+/* src/ui/pages/Evaluation.css */
+
+.evaluation-header {
+  background: linear-gradient(90deg, #001529 0%, #003a8c 100%);
+  padding: 20px 40px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.evaluation-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.evaluation-content {
+  padding: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.evaluation-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border: none;
+}
+
+.criterion-card {
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.criterion-card:hover {
+  border-color: #1890ff;
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .evaluation-header {
+    padding: 16px 24px;
+  }
+  
+  .evaluation-header-content {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+  }
+  
+  .evaluation-content {
+    padding: 24px;
+  }
+}

@@ -1,0 +1,274 @@
+/* src/ui/pages/Settings.css */
+.settings-header {
+  background: linear-gradient(90deg, #001529 0%, #003a8c 100%);
+  padding: 20px 40px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.settings-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.settings-content {
+  padding: 40px;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.settings-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.settings-card:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+/* Estilos para los switches */
+.settings-card .ant-switch {
+  background: #d9d9d9;
+}
+
+.settings-card .ant-switch-checked {
+  background: #1890ff;
+}
+
+.settings-card .ant-form-item-label > label {
+  font-weight: 500;
+  color: #262626;
+}
+
+/* Estilos para los selects */
+.settings-card .ant-select-selector {
+  border-radius: 8px;
+  border: 1px solid #d9d9d9;
+}
+
+.settings-card .ant-select-selector:hover {
+  border-color: #40a9ff;
+}
+
+.settings-card .ant-select-focused .ant-select-selector {
+  border-color: #40a9ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+/* Estilos para las secciones de seguridad */
+.security-section {
+  border-left: 4px solid #1890ff;
+  padding-left: 16px;
+  margin-bottom: 16px;
+}
+
+.security-section:last-child {
+  margin-bottom: 0;
+}
+
+.security-section .ant-btn {
+  border-radius: 6px;
+}
+
+/* Estilos para la lista de información del sistema */
+.system-info-list .ant-list-item {
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.system-info-list .ant-list-item:last-child {
+  border-bottom: none;
+}
+
+.system-info-list .ant-list-item-meta-title {
+  font-size: 14px;
+  color: #595959;
+  margin-bottom: 4px;
+}
+
+.system-info-list .ant-list-item-meta-description {
+  font-size: 16px;
+  color: #262626;
+  font-weight: 500;
+}
+
+/* Estilos para los botones de acción */
+.settings-actions {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border: 1px solid #e8e8e8;
+}
+
+.settings-actions .ant-btn-primary {
+  background: #1890ff;
+  border-color: #1890ff;
+  height: 44px;
+  font-weight: 500;
+  border-radius: 8px;
+}
+
+.settings-actions .ant-btn-primary:hover {
+  background: #40a9ff;
+  border-color: #40a9ff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+}
+
+.settings-actions .ant-btn:not(.ant-btn-primary) {
+  border-radius: 8px;
+  height: 44px;
+  border: 1px solid #d9d9d9;
+  color: #595959;
+}
+
+.settings-actions .ant-btn:not(.ant-btn-primary):hover {
+  border-color: #40a9ff;
+  color: #40a9ff;
+}
+
+/* Estilos para los íconos en las tarjetas */
+.settings-card .ant-card-head-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: #262626;
+}
+
+.settings-card .ant-card-head-title .anticon {
+  font-size: 18px;
+}
+
+/* Estilos para los dividers */
+.settings-card .ant-divider {
+  margin: 20px 0;
+  border-color: #f0f0f0;
+}
+
+/* Estados de hover para las tarjetas */
+.settings-card:hover {
+  transform: translateY(-2px);
+}
+
+/* Estilos para los formularios */
+.settings-card .ant-form-item {
+  margin-bottom: 20px;
+}
+
+.settings-card .ant-form-item-label {
+  padding-bottom: 6px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .settings-header {
+    padding: 16px 24px;
+  }
+  
+  .settings-header-content {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+  }
+  
+  .settings-content {
+    padding: 24px;
+  }
+
+  .settings-card {
+    margin-bottom: 16px;
+  }
+
+  .security-section {
+    padding-left: 12px;
+    margin-bottom: 12px;
+  }
+
+  .settings-actions .ant-btn {
+    height: 40px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .settings-header {
+    padding: 12px 16px;
+  }
+  
+  .settings-content {
+    padding: 16px;
+  }
+
+  .settings-card .ant-card-head-title {
+    font-size: 16px;
+  }
+
+  .system-info-list .ant-list-item-meta-title {
+    font-size: 13px;
+  }
+
+  .system-info-list .ant-list-item-meta-description {
+    font-size: 14px;
+  }
+}
+
+/* Estilos para los tags en la información del sistema */
+.system-info-list .ant-tag {
+  border-radius: 6px;
+  font-weight: 500;
+  border: none;
+}
+
+/* Estilos para los espacios entre elementos */
+.settings-card .ant-space {
+  width: 100%;
+}
+
+.settings-card .ant-space-vertical > .ant-space-item {
+  width: 100%;
+}
+
+/* Efectos de transición suaves */
+.settings-card,
+.settings-card .ant-btn,
+.settings-card .ant-switch,
+.settings-card .ant-select-selector {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Estilos para el estado de carga */
+.settings-card .ant-btn-loading {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Estilos para los tooltips */
+.settings-card .ant-tooltip {
+  font-size: 12px;
+}
+
+/* Estilos para los mensajes de confirmación */
+.settings-card .ant-popconfirm {
+  max-width: 300px;
+}
+
+/* Estilos para los modales */
+.settings-card .ant-modal-content {
+  border-radius: 12px;
+}
+
+.settings-card .ant-modal-header {
+  border-radius: 12px 12px 0 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.settings-card .ant-modal-title {
+  font-weight: 600;
+  color: #262626;
+}
