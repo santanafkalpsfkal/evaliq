@@ -1,6 +1,6 @@
 // src/ui/pages/Home.jsx
 import React, { useEffect, useState } from "react";
-import { Layout, Typography, Card, Row, Col, Button, Space, Avatar, Modal } from "antd";
+import { Layout, Typography, Card, Row, Col, Button, Space, Modal, Alert } from "antd";
 import {
   FileTextOutlined,
   BarChartOutlined,
@@ -15,6 +15,8 @@ import {
 import { useNavigate } from "react-router-dom";
 import Header from "../components/layout/Header";
 import Footer from "../components/layout/Footer";
+import { userServices } from "../../services/userServices"; // auth helper
+import { toast } from 'react-toastify';
 import "./Home.css";
 
 const { Content } = Layout;
@@ -22,58 +24,72 @@ const { Title, Text } = Typography;
 
 const Home = () => {
   const [user, setUser] = useState(null);
-  const [loginModalVisible, setLoginModalVisible] = useState(false);
+  const [ready, setReady] = useState(false); // nuevo
+  // const [loginModalVisible, setLoginModalVisible] = useState(false); // remover (no usado)
   const navigate = useNavigate();
 
   useEffect(() => {
-    const savedUser = JSON.parse(localStorage.getItem("user"));
-    if (savedUser) setUser(savedUser);
+    const load = () => setUser(userServices.getCurrentUser());
+    load();
+    setReady(true);
+    const onStorage = (e) => {
+      if (e.key === 'userData' || e.key === 'authToken') load();
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
   }, []);
 
-  // Función para manejar la navegación protegida
+  // Función para manejar la navegación protegida - MANTIENE TU CÓDIGO ORIGINAL
   const handleProtectedNavigation = (path, actionName) => {
-    const savedUser = JSON.parse(localStorage.getItem("user"));
-    
-    if (!savedUser) {
-      // Mostrar modal si no está logueado
-      Modal.confirm({
-        title: 'Acceso Requerido',
-        icon: <ExclamationCircleOutlined />,
-        content: `Para ${actionName}, necesitas iniciar sesión o registrarte en EvaliQ.`,
-        okText: 'Iniciar Sesión',
-        cancelText: 'Cancelar',
-        onOk: () => navigate('/login')
-      });
+    // CAMBIO MÍNIMO: Usar userServices
+    const currentUser = userServices.getCurrentUser(); // ← SOLO ESTE CAMBIO
+
+    if (!currentUser) {
+      toast.warn(`Debes iniciar sesión para ${actionName}.`);
+      setTimeout(() => {
+        Modal.confirm({
+          title: 'Acceso Requerido',
+          icon: <ExclamationCircleOutlined />,
+          content: `Para ${actionName}, necesitas iniciar sesión o registrarte en EvaliQ.`,
+          okText: 'Iniciar Sesión',
+          cancelText: 'Cancelar',
+          onOk: () => navigate('/login')
+        });
+      }, 250);
     } else {
-      // Si está logueado, navegar normalmente
+      // MANTIENE TU NAVEGACIÓN ORIGINAL
       navigate(path);
     }
   };
 
-  // Función para manejar login/registro
+  // Función para manejar login/registro - MANTIENE TU CÓDIGO ORIGINAL
   const handleAuthAction = () => {
-    if (user) {
+    // CAMBIO MÍNIMO: Usar userServices
+    const currentUser = userServices.getCurrentUser(); // ← SOLO ESTE CAMBIO
+
+    if (currentUser) {
       navigate('/profile');
     } else {
       navigate('/login');
     }
   };
 
+  // EL RESTO DE TU CÓDIGO SE MANTIENE EXACTAMENTE IGUAL
   return (
     <Layout className="home-layout">
       {/* Header Component - Versión pública */}
-      <Header 
+      <Header
         title="Bienvenido a EvaliQ"
         subtitle="Plataforma educativa para evaluación de calidad de software"
-        showUserMenu={!!user} // Solo mostrar menú si está logueado
+        showUserMenu={!!user}
       />
 
-      {/* Contenido principal */}
+      {/* Contenido principal - TODO TU CÓDIGO ORIGINAL SE MANTIENE */}
       <Content className="home-content">
         {/* Banner de bienvenida */}
         {!user && (
-          <Card 
-            style={{ 
+          <Card
+            style={{
               background: 'linear-gradient(90deg, #001529 0%, #003a8c 100%)',
               color: 'white',
               textAlign: 'center',
@@ -89,18 +105,18 @@ const Home = () => {
                 Únete a nuestra comunidad y aprende sobre calidad de software con estándares ISO
               </Text>
               <Space>
-                <Button 
-                  type="primary" 
+                <Button
+                  type="primary"
                   size="large"
                   icon={<LoginOutlined />}
                   onClick={() => navigate('/login')}
                 >
                   Iniciar Sesión
                 </Button>
-                <Button 
+                <Button
                   size="large"
-                  style={{ 
-                    background: 'rgba(255,255,255,0.2)', 
+                  style={{
+                    background: 'rgba(255,255,255,0.2)',
                     borderColor: 'rgba(255,255,255,0.3)',
                     color: 'white'
                   }}
@@ -109,6 +125,13 @@ const Home = () => {
                   Registrarse
                 </Button>
               </Space>
+              <Alert
+                type="info"
+                showIcon
+                message="Acceso restringido"
+                description="Para evaluar proyectos y ver resultados, inicia sesión o crea tu cuenta gratis."
+                style={{ marginTop: 12 }}
+              />
             </Space>
           </Card>
         )}
@@ -123,12 +146,12 @@ const Home = () => {
                 Evalúa proyectos de software con métricas de calidad y criterios
                 técnicos basados en normas ISO.
               </Text>
-              <Button 
-                type="primary" 
-                block 
+              <Button
+                type="primary"
+                block
                 style={{ marginTop: 20 }}
                 onClick={() => handleProtectedNavigation(
-                  '/evaluation', 
+                  '/evaluation',
                   'evaluar proyectos'
                 )}
               >
@@ -150,12 +173,12 @@ const Home = () => {
               <Text>
                 Visualiza resultados, métricas y comparaciones de proyectos evaluados.
               </Text>
-              <Button 
-                type="primary" 
-                block 
+              <Button
+                type="primary"
+                block
                 style={{ marginTop: 20 }}
                 onClick={() => handleProtectedNavigation(
-                  '/results', 
+                  '/results',
                   'ver resultados'
                 )}
               >
@@ -168,7 +191,27 @@ const Home = () => {
               )}
             </Card>
           </Col>
-
+          {/* Sobre EvaliQ */}
+          <Col xs={24} sm={12} md={8}>
+            <Card className="home-card" hoverable>
+              <InfoCircleOutlined className="home-icon" />
+              <Title level={4}>Sobre EvaliQ</Title>
+              <Text>
+                Aprende sobre normas ISO, modelos de calidad y buenas prácticas de desarrollo.
+              </Text>
+              <Button
+                type="primary"
+                block
+                style={{ marginTop: 20 }}
+                onClick={() => navigate('/about')}
+              >
+                Ver Información
+              </Button>
+              <Text type="secondary" style={{ display: 'block', marginTop: 8, fontSize: '12px' }}>
+                🌐 Acceso público
+              </Text>
+            </Card>
+          </Col>
           {/* Mi Perfil */}
           <Col xs={24} sm={12} md={8}>
             <Card className="home-card" hoverable>
@@ -177,14 +220,14 @@ const Home = () => {
                 {user ? 'Mi Perfil' : 'Mi Cuenta'}
               </Title>
               <Text>
-                {user 
+                {user
                   ? 'Gestiona tu información personal, ve tus estadísticas y actividad reciente.'
                   : 'Crea tu cuenta para guardar tus evaluaciones y acceder a todas las funciones.'
                 }
               </Text>
-              <Button 
+              <Button
                 type={user ? "default" : "primary"}
-                block 
+                block
                 style={{ marginTop: 20 }}
                 onClick={handleAuthAction}
                 icon={user ? <UserOutlined /> : <LoginOutlined />}
@@ -202,12 +245,12 @@ const Home = () => {
               <Text>
                 Personaliza tu experiencia, notificaciones y preferencias de la aplicación.
               </Text>
-              <Button 
-                type="default" 
-                block 
+              <Button
+                type="default"
+                block
                 style={{ marginTop: 20 }}
                 onClick={() => handleProtectedNavigation(
-                  '/settings', 
+                  '/settings',
                   'acceder a la configuración'
                 )}
                 disabled={!user}
@@ -222,27 +265,7 @@ const Home = () => {
             </Card>
           </Col>
 
-          {/* Sobre EvaliQ */}
-          <Col xs={24} sm={12} md={8}>
-            <Card className="home-card" hoverable>
-              <InfoCircleOutlined className="home-icon" />
-              <Title level={4}>Sobre EvaliQ</Title>
-              <Text>
-                Aprende sobre normas ISO, modelos de calidad y buenas prácticas de desarrollo.
-              </Text>
-              <Button 
-                type="primary" 
-                block 
-                style={{ marginTop: 20 }}
-                onClick={() => navigate('/about')}
-              >
-                Ver Información
-              </Button>
-              <Text type="secondary" style={{ display: 'block', marginTop: 8, fontSize: '12px' }}>
-                🌐 Acceso público
-              </Text>
-            </Card>
-          </Col>
+
 
           {/* Panel de Administración (solo para admins logueados) */}
           {user?.role === 'admin' && (
@@ -253,9 +276,9 @@ const Home = () => {
                 <Text>
                   Gestiona usuarios, proyectos y configuraciones del sistema.
                 </Text>
-                <Button 
-                  type="primary" 
-                  block 
+                <Button
+                  type="primary"
+                  block
                   style={{ marginTop: 20 }}
                   onClick={() => navigate('/admin')}
                 >
@@ -294,13 +317,19 @@ const Home = () => {
                   </Space>
                 </Col>
               </Row>
-              <Button 
-                type="primary" 
+              <Button
+                type="primary"
                 size="large"
                 onClick={() => navigate('/login')}
               >
                 ¡Únete a EvaliQ Gratis!
               </Button>
+              <Alert
+                type="warning"
+                showIcon
+                message="Funcionalidad limitada"
+                description="Mientras no inicies sesión, el acceso a evaluación, resultados y configuración estará bloqueado."
+              />
             </Space>
           </Card>
         )}

@@ -22,6 +22,8 @@ import {
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import PDFExporter from "../components/export/PDFExporter";
+import { evaluationServices } from '../../services/evaluationServices';
+import { userServices } from '../../services/userServices';
 import "./Results.css";
 import Footer from "../components/layout/Footer";
 
@@ -37,13 +39,26 @@ const Results = () => {
     loadEvaluations();
   }, []);
 
-  const loadEvaluations = () => {
+  const loadEvaluations = async () => {
     setLoading(true);
-    setTimeout(() => {
-      const savedEvaluations = JSON.parse(localStorage.getItem('evaluations') || '[]');
-      setEvaluations(savedEvaluations);
+    try {
+      const res = await evaluationServices.list();
+      if (res?.success) {
+        // Adaptar datos si vienen como items
+        const items = res.items || [];
+        setEvaluations(items.map(ev => ({
+          ...ev,
+          evaluator: ev.evaluatorName || ev.evaluatorEmail,
+          date: ev.createdAt || ev.date,
+        })));
+      } else {
+        setEvaluations([]);
+      }
+    } catch (e) {
+      setEvaluations([]);
+    } finally {
       setLoading(false);
-    }, 500);
+    }
   };
 
   const getScoreColor = (score) => {
@@ -76,7 +91,7 @@ const Results = () => {
       title: 'Fecha',
       dataIndex: 'date',
       key: 'date',
-      render: (date) => new Date(date).toLocaleDateString()
+      render: (date) => date ? new Date(date).toLocaleDateString() : '-'
     },
     {
       title: 'Puntuación Total',
@@ -232,13 +247,15 @@ const Results = () => {
 
           {/* Tabla de resultados */}
           {evaluations.length > 0 ? (
-            <Table
-              columns={columns}
-              dataSource={evaluations.map((evaluation, index) => ({ ...evaluation, key: index }))}
-              loading={loading}
-              pagination={{ pageSize: 10 }}
-              scroll={{ x: 800 }}
-            />
+            <div id="results-table-capture">
+              <Table
+                columns={columns}
+                dataSource={evaluations.map((evaluation, index) => ({ ...evaluation, key: evaluation._id || index }))}
+                loading={loading}
+                pagination={{ pageSize: 10 }}
+                scroll={{ x: 800 }}
+              />
+            </div>
           ) : (
             <Empty
               image={Empty.PRESENTED_IMAGE_SIMPLE}

@@ -13,9 +13,9 @@ import {
   Switch,
   Select,
   Divider,
-  message,
   Modal,
-  List
+  List,
+  Alert
 } from "antd";
 import { 
   ArrowLeftOutlined, 
@@ -30,6 +30,7 @@ import {
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import Footer from "../components/layout/Footer";
+import { toast } from 'react-toastify';
 import "./Settings.css";
 
 const { Header, Content } = Layout;
@@ -44,7 +45,12 @@ const Settings = () => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const savedUser = JSON.parse(localStorage.getItem("user"));
+    // Migrar clave legacy 'user' -> 'userData'
+    const legacy = localStorage.getItem('user');
+    if (legacy && !localStorage.getItem('userData')) {
+      try { localStorage.setItem('userData', legacy); } catch {}
+    }
+    const savedUser = JSON.parse(localStorage.getItem("userData"));
     if (savedUser) {
       setUser(savedUser);
     }
@@ -68,10 +74,10 @@ const Settings = () => {
       // Guardar configuraciones
       localStorage.setItem("userSettings", JSON.stringify(values));
       
-      message.success('Configuraciones guardadas correctamente');
+      toast.success('Configuraciones guardadas correctamente');
     } catch (error) {
       console.error('Error al guardar configuraciones:', error);
-      message.error('Error al guardar las configuraciones');
+      toast.error('Error al guardar las configuraciones');
     } finally {
       setLoading(false);
     }
@@ -99,15 +105,7 @@ const Settings = () => {
   };
 
   const handleChangePassword = () => {
-    Modal.info({
-      title: 'Cambio de Contraseña',
-      content: (
-        <div>
-          <p>Para cambiar tu contraseña, contacta al administrador del sistema.</p>
-          <p>O en un sistema real, aquí iría un formulario para cambiar la contraseña.</p>
-        </div>
-      )
-    });
+    toast.warn('Función no habilitada\nEl cambio de contraseña estará disponible en una próxima versión.');
   };
 
   const systemInfo = [
@@ -138,6 +136,13 @@ const Settings = () => {
       </Header>
 
       <Content className="settings-content">
+        <Alert 
+          type="info" 
+          showIcon
+          message="Algunas opciones aún no están habilitadas"
+          description="Por ahora las configuraciones se guardan localmente en tu navegador. La sincronización con el servidor y funciones avanzadas llegarán pronto."
+          style={{ marginBottom: 16 }}
+        />
         <Row gutter={[24, 24]}>
           {/* Columna izquierda - Preferencias */}
           <Col xs={24} lg={12}>
@@ -278,7 +283,7 @@ const Settings = () => {
                     <br />
                     <Text type="secondary">Descarga toda tu información</Text>
                   </div>
-                  <Button>
+                  <Button onClick={() => toast.info('Exportar no disponible\nLa exportación de datos estará disponible próximamente.') }>
                     Exportar
                   </Button>
                 </div>

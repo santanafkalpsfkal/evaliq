@@ -1,6 +1,6 @@
 // src/ui/components/layout/Header.jsx
 import React from "react";
-import { Layout, Typography, Button, Dropdown, Space, Avatar, message } from "antd";
+import { Layout, Typography, Button, Dropdown, Space, Avatar } from "antd";
 import {
   UserOutlined,
   LogoutOutlined,
@@ -11,6 +11,8 @@ import {
   LoginOutlined
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import { userServices } from "../../../services/userServices"; // ← SOLO ESTA LÍNEA NUEVA
+import { toast } from 'react-toastify';
 import "./Header.css";
 
 const { Header: AntHeader } = Layout;
@@ -18,33 +20,50 @@ const { Title, Text } = Typography;
 
 const Header = ({ title, subtitle, showUserMenu = true }) => {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user"));
+  // CAMBIO MÍNIMO: Usar userServices en lugar de localStorage directo
+  const [user, setUser] = React.useState(() => userServices.getCurrentUser());
+  // Reactivar estado usuario en cambios de storage para que el menú desaparezca tras logout
+  React.useEffect(() => {
+    const onStorage = (e) => {
+      if (e.key === 'userData' || e.key === 'authToken') {
+        setUser(userServices.getCurrentUser());
+      }
+    };
+    const onSessionChanged = () => setUser(userServices.getCurrentUser());
+    window.addEventListener('storage', onStorage);
+    window.addEventListener('session-changed', onSessionChanged);
+    return () => {
+      window.removeEventListener('storage', onStorage);
+      window.removeEventListener('session-changed', onSessionChanged);
+    };
+  }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("authToken");
-    message.success("Sesión cerrada correctamente");
-    navigate("/login");
+    // Un solo aviso (toast) y navegar cuando se cierre automáticamente
+    userServices.logout();
+    setUser(null);
+    toast.info('Cerrando sesión...', {
+      autoClose: 2000,
+      onClose: () => navigate('/login')
+    });
   };
 
+  // EL RESTO DE TU CÓDIGO SE MANTIENE EXACTAMENTE IGUAL
   const userMenuItems = [
     {
       key: 'profile',
       icon: <ProfileOutlined />,
-      label: 'Mi Perfil',
-      onClick: () => navigate('/profile')
+      label: 'Mi Perfil'
     },
     {
       key: 'settings',
       icon: <SettingOutlined />,
-      label: 'Configuración',
-      onClick: () => navigate('/settings')
+      label: 'Configuración'
     },
     ...(user?.role === 'admin' ? [{
       key: 'admin',
       icon: <TeamOutlined />,
-      label: 'Panel Admin',
-      onClick: () => navigate('/admin')
+      label: 'Panel Admin'
     }] : []),
     {
       type: 'divider',
@@ -53,9 +72,16 @@ const Header = ({ title, subtitle, showUserMenu = true }) => {
       key: 'logout',
       icon: <LogoutOutlined />,
       label: 'Cerrar Sesión',
-      onClick: handleLogout,
+      onClick: () => handleLogout(),
     },
   ];
+
+  const onUserMenuClick = ({ key }) => {
+    if (key === 'logout') return handleLogout();
+    if (key === 'profile') return navigate('/profile');
+    if (key === 'settings') return navigate('/settings');
+    if (key === 'admin') return navigate('/admin');
+  };
 
   // Estilos para el dropdown
   const dropdownStyle = {
@@ -81,7 +107,7 @@ const Header = ({ title, subtitle, showUserMenu = true }) => {
         {showUserMenu && user ? (
           // Menú para usuarios logueados
           <Dropdown 
-            menu={{ items: userMenuItems }} 
+            menu={{ items: userMenuItems, onClick: onUserMenuClick }} 
             placement="bottomRight"
             trigger={['click']}
             dropdownStyle={dropdownStyle}

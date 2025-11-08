@@ -1,20 +1,20 @@
 // src/ui/pages/About.jsx
 import React from "react";
-import { 
-  Layout, 
-  Typography, 
-  Card, 
-  Row, 
-  Col, 
-  Button, 
-  Space, 
+import {
+  Layout,
+  Typography,
+  Card,
+  Row,
+  Col,
+  Button,
+  Space,
   Tag,
   List,
   Divider,
   Collapse
 } from "antd";
-import { 
-  ArrowLeftOutlined, 
+import {
+  ArrowLeftOutlined,
   BookOutlined,
   StarOutlined,
   CheckCircleOutlined,
@@ -22,6 +22,7 @@ import {
   GlobalOutlined
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import { userServices } from "../../services/userServices"; // ← AGREGAR ESTA LÍNEA
 import "./About.css";
 import Footer from "../components/layout/Footer";
 
@@ -31,7 +32,8 @@ const { Panel } = Collapse;
 
 const About = () => {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user"));
+  // CAMBIO: Usar userServices en lugar de localStorage directo
+  const user = userServices.getCurrentUser(); // ← CAMBIO AQUÍ
 
   // Datos educativos sobre normas ISO
   const isoStandards = [
@@ -40,7 +42,7 @@ const About = () => {
       description: "Sistema de calidad de productos de software",
       characteristics: [
         "Funcionalidad",
-        "Confiabilidad de rendimiento", 
+        "Confiabilidad de rendimiento",
         "Compatibilidad",
         "Usabilidad",
         "Eficiencia de rendimiento",
@@ -58,7 +60,7 @@ const About = () => {
         "Confiabilidad",
         "Usabilidad",
         "Eficiencia",
-        "Mantenibilidad", 
+        "Mantenibilidad",
         "Portabilidad"
       ],
       year: 2001
@@ -73,7 +75,7 @@ const About = () => {
     },
     {
       name: "CMMI (Capability Maturity Model Integration)",
-      focus: "Mejora de procesos organizacionales", 
+      focus: "Mejora de procesos organizacionales",
       levels: ["Inicial", "Gestionado", "Definido", "Gestionado cuantitativamente", "Optimización"]
     },
     {
@@ -91,7 +93,7 @@ const About = () => {
     },
     {
       criterion: "Confiabilidad",
-      description: "Capacidad de mantener el nivel de desempeño bajo condiciones establecidas", 
+      description: "Capacidad de mantener el nivel de desempeño bajo condiciones establecidas",
       metrics: ["Madurez", "Tolerancia a fallos", "Recuperabilidad"]
     },
     {
@@ -105,7 +107,7 @@ const About = () => {
       metrics: ["Comportamiento temporal", "Utilización de recursos"]
     },
     {
-      criterion: "Mantenibilidad", 
+      criterion: "Mantenibilidad",
       description: "Capacidad de ser modificado efectivamente y eficientemente",
       metrics: ["Analizabilidad", "Modificabilidad", "Estabilidad"]
     }
@@ -121,17 +123,17 @@ const About = () => {
               <BookOutlined /> Sobre EvaliQ
             </Title>
           </div>
-          
+
           <Space>
             {user ? (
               <>
-                <Button 
+                <Button
                   icon={<ArrowLeftOutlined />}
                   onClick={() => navigate('/home')}
                 >
                   Volver al Home
                 </Button>
-                <Button 
+                <Button
                   type="primary"
                   onClick={() => navigate('/evaluation')}
                 >
@@ -139,7 +141,7 @@ const About = () => {
                 </Button>
               </>
             ) : (
-              <Button 
+              <Button
                 type="primary"
                 onClick={() => navigate('/login')}
               >
@@ -155,9 +157,9 @@ const About = () => {
         <Card className="about-card" style={{ marginBottom: 24 }}>
           <Title level={3}>¿Qué es EvaliQ?</Title>
           <Paragraph>
-            EvaliQ es una plataforma educativa diseñada para enseñar y practicar conceptos 
-            fundamentales de <Text strong>calidad de software</Text>. Nuestro objetivo es 
-            proporcionar herramientas interactivas que faciliten el aprendizaje de normas 
+            EvaliQ es una plataforma educativa diseñada para enseñar y practicar conceptos
+            fundamentales de <Text strong>calidad de software</Text>. Nuestro objetivo es
+            proporcionar herramientas interactivas que faciliten el aprendizaje de normas
             internacionales, modelos de calidad y técnicas de evaluación.
           </Paragraph>
           <Space>
@@ -170,13 +172,13 @@ const About = () => {
         <Row gutter={[24, 24]}>
           {/* Normas ISO */}
           <Col xs={24} lg={12}>
-            <Card 
+            <Card
               title={
                 <Space>
                   <InfoCircleOutlined />
                   <span>Normas Internacionales ISO</span>
                 </Space>
-              } 
+              }
               className="about-card"
             >
               <List
@@ -209,13 +211,13 @@ const About = () => {
 
           {/* Modelos de Calidad */}
           <Col xs={24} lg={12}>
-            <Card 
+            <Card
               title={
                 <Space>
                   <StarOutlined />
                   <span>Modelos de Calidad</span>
                 </Space>
-              } 
+              }
               className="about-card"
             >
               <Collapse ghost>
@@ -256,16 +258,16 @@ const About = () => {
         </Row>
 
         {/* Criterios de Evaluación */}
-        <Card 
-          title="Criterios de Evaluación en EvaliQ" 
+        <Card
+          title="Criterios de Evaluación en EvaliQ"
           className="about-card"
           style={{ marginTop: 24 }}
         >
           <Row gutter={[16, 16]}>
             {evaluationCriteria.map((criterion, index) => (
               <Col xs={24} md={12} lg={8} key={index}>
-                <Card 
-                  size="small" 
+                <Card
+                  size="small"
                   title={criterion.criterion}
                   className="criterion-card"
                 >
@@ -283,40 +285,6 @@ const About = () => {
               </Col>
             ))}
           </Row>
-        </Card>
-
-        {/* CTA Final */}
-        <Card className="about-card" style={{ marginTop: 24, textAlign: 'center' }}>
-          <Title level={4}>¿Listo para comenzar?</Title>
-          <Paragraph>
-            Practica la evaluación de calidad de software utilizando estándares internacionales 
-            y mejora tus habilidades en ingeniería de software.
-          </Paragraph>
-          {user ? (
-            <Button 
-              type="primary" 
-              size="large"
-              onClick={() => navigate('/evaluation')}
-            >
-              Comenzar Evaluación
-            </Button>
-          ) : (
-            <Space>
-              <Button 
-                type="primary" 
-                size="large"
-                onClick={() => navigate('/login')}
-              >
-                Iniciar Sesión
-              </Button>
-              <Button 
-                size="large"
-                onClick={() => navigate('/login')}
-              >
-                Registrarse
-              </Button>
-            </Space>
-          )}
         </Card>
       </Content>
       <Footer />

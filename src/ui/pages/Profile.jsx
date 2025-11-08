@@ -14,8 +14,8 @@ import {
   Statistic,
   Tag,
   Divider,
-  message,
-  Upload
+  Upload,
+  Alert
 } from "antd";
 import { 
   ArrowLeftOutlined, 
@@ -26,11 +26,15 @@ import {
   CalendarOutlined,
   TeamOutlined,
   BarChartOutlined,
-  UploadOutlined
+  UploadOutlined,
+  LockOutlined,
+  MobileOutlined,
+  CloudUploadOutlined
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import "./Profile.css";
 import Footer from "../components/layout/Footer";
+import { toast } from 'react-toastify';
 
 const { Header, Content } = Layout;
 const { Title, Text } = Typography;
@@ -46,13 +50,19 @@ const Profile = () => {
     averageScore: 0,
     projectsEvaluated: 0
   });
+  const [showUpcoming, setShowUpcoming] = useState(true);
 
   useEffect(() => {
     loadUserData();
   }, []);
 
   const loadUserData = () => {
-    const savedUser = JSON.parse(localStorage.getItem("user"));
+    // Unificar clave: usamos 'userData' (migrado desde 'user')
+    const legacyUser = localStorage.getItem("user");
+    if (legacyUser && !localStorage.getItem("userData")) {
+      try { localStorage.setItem("userData", legacyUser); } catch {}
+    }
+    const savedUser = JSON.parse(localStorage.getItem("userData"));
     if (savedUser) {
       setUser(savedUser);
       form.setFieldsValue({
@@ -87,6 +97,10 @@ const Profile = () => {
     setEditing(true);
   };
 
+  const notifyFeature = (feature) => {
+    toast.warn(`${feature} próximamente\nEsta funcionalidad aún no está habilitada. Estamos trabajando para incluirla en próximas versiones.`);
+  };
+
   const handleSave = async () => {
     try {
       setLoading(true);
@@ -99,13 +113,14 @@ const Profile = () => {
       };
       
       // Actualizar en localStorage
-      localStorage.setItem("user", JSON.stringify(updatedUser));
+  localStorage.setItem("userData", JSON.stringify(updatedUser));
       setUser(updatedUser);
       
-      message.success('Perfil actualizado correctamente');
+      toast.success('Perfil actualizado correctamente');
       setEditing(false);
     } catch (error) {
       console.error('Error al guardar:', error);
+      toast.error('No se pudo actualizar el perfil');
     } finally {
       setLoading(false);
     }
@@ -203,7 +218,10 @@ const Profile = () => {
                   {editing && (
                     <Upload 
                       showUploadList={false}
-                      beforeUpload={() => false}
+                      beforeUpload={() => {
+                        notifyFeature('Subir foto de perfil');
+                        return false; // impedir subida real
+                      }}
                     >
                       <Button icon={<UploadOutlined />}>
                         Cambiar Foto
@@ -376,6 +394,39 @@ const Profile = () => {
                 </div>
               </Space>
             </Card>
+
+            {showUpcoming && (
+              <Card
+                title={
+                  <Space>
+                    <CloudUploadOutlined />
+                    <span>Funciones Próximamente</span>
+                  </Space>
+                }
+                className="profile-card"
+                style={{ marginTop: 24 }}
+                extra={<Button type="link" onClick={() => setShowUpcoming(false)}>Ocultar</Button>}
+              >
+                <Alert
+                  type="info"
+                  message="Estamos preparando más herramientas para tu perfil"
+                  description="Edición avanzada, verificación en dos pasos y carga real de avatar estarán disponibles pronto."
+                  showIcon
+                  style={{ marginBottom: 16 }}
+                />
+                <Space direction="vertical" style={{ width: '100%' }}>
+                  <Button icon={<LockOutlined />} block onClick={() => notifyFeature('Verificación en dos pasos')}>
+                    Verificación en Dos Pasos
+                  </Button>
+                  <Button icon={<MobileOutlined />} block onClick={() => notifyFeature('Notificaciones push')}>
+                    Notificaciones Push
+                  </Button>
+                  <Button icon={<CloudUploadOutlined />} block onClick={() => notifyFeature('Historial de versiones de perfil')}>
+                    Historial de Cambios de Perfil
+                  </Button>
+                </Space>
+              </Card>
+            )}
           </Col>
         </Row>
       </Content>

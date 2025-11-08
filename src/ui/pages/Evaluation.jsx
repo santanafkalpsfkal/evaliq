@@ -20,6 +20,8 @@ import {
   CheckCircleOutlined
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import { userServices } from "../../services/userServices"; // auth helper
+import { evaluationServices } from "../../services/evaluationServices"; // backend real
 import "./Evaluation.css";
 import Footer from "../components/layout/Footer";
 
@@ -62,9 +64,16 @@ const Evaluation = () => {
   ];
 
   useEffect(() => {
-    const savedUser = JSON.parse(localStorage.getItem("user"));
-    if (savedUser) setUser(savedUser);
-  }, []);
+    // CAMBIO: Usar userServices en lugar de localStorage directo
+    const currentUser = userServices.getCurrentUser(); // ← CAMBIO AQUÍ
+    if (currentUser) {
+      setUser(currentUser);
+    } else {
+      // Si no está autenticado, redirigir al login
+      message.warning('Por favor inicia sesión para acceder a las evaluaciones');
+      navigate('/login');
+    }
+  }, [navigate]);
 
   const onValuesChange = (changedValues, allValues) => {
     // Calcular puntuación total
@@ -75,21 +84,26 @@ const Evaluation = () => {
 
   const handleSubmit = async (values) => {
     try {
-      // Simular envío de evaluación
-      console.log('Datos de evaluación:', values);
+      // Verificar que el usuario esté autenticado
+      const currentUser = userServices.getCurrentUser(); // ← CAMBIO AQUÍ
+      if (!currentUser) {
+        message.error('Sesión expirada. Por favor inicia sesión nuevamente.');
+        navigate('/login');
+        return;
+      }
 
-      // Guardar en localStorage (simulación)
-      const evaluations = JSON.parse(localStorage.getItem('evaluations') || '[]');
-      evaluations.push({
-        id: Date.now(),
-        projectName: values.projectName,
-        scores: values,
-        totalScore,
-        evaluator: user?.name,
-        date: new Date().toISOString()
-      });
-      localStorage.setItem('evaluations', JSON.stringify(evaluations));
-
+      // Construir payload y guardar en backend
+      const { projectName, comments, ...scoreFields } = values;
+      const payload = {
+        projectName,
+        comments,
+        scores: scoreFields,
+      };
+      const res = await evaluationServices.create(payload);
+      if (!res?.success) {
+        message.error(res?.error || 'No se pudo guardar la evaluación');
+        return;
+      }
       message.success('Evaluación guardada correctamente');
 
       // Redirigir a resultados después de 1.5 segundos
@@ -98,9 +112,21 @@ const Evaluation = () => {
       }, 1500);
 
     } catch (error) {
+      console.error('Error creando evaluación', error);
       message.error('Error al guardar la evaluación');
     }
   };
+
+  // Si no hay usuario, mostrar loading o redirigir
+  if (!user) {
+    return (
+      <Layout style={{ minHeight: "100vh", background: "#f4f6f9" }}>
+        <Content style={{ padding: '50px', textAlign: 'center' }}>
+          <div>Cargando...</div>
+        </Content>
+      </Layout>
+    );
+  }
 
   return (
     <Layout style={{ minHeight: "100vh", background: "#f4f6f9" }}>
@@ -115,12 +141,9 @@ const Evaluation = () => {
           </div>
 
           <Space>
-            <Statistic
-              title="Puntuación Total"
-              value={totalScore}
-              prefix={<CheckCircleOutlined />}
-              valueStyle={{ color: totalScore > 15 ? '#52c41a' : '#faad14' }}
-            />
+            <Text style={{ color: "rgba(255,255,255,0.8)", fontSize: "11px" }}>
+              Evaluador: {user.name} {/* ← MUESTRA user real */}
+            </Text>
           </Space>
         </div>
       </Header>

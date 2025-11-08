@@ -4,16 +4,30 @@
   display: flex;
   justify-content: center;
   align-items: center;
-   background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
-              url('/src/assets/FondoLogin.jpg');
+  background:
+    linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)),
+    url('/src/assets/FondoLogin.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }
 
 .login-card {
-  width: 380px;
-  padding: 32px 24px;
+  width: 320px;
+  padding: 24px 20px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.616);
   border-radius: 16px;
   background-color: #ffffff;
+  transition: width .25s ease, padding .25s ease;
+}
+
+/* Wider variant for register (same vertical feel, more horizontal space) */
+.login-card.register-wide {
+  width: 600px;
+  max-width: 95vw;
+  padding: 28px 34px 30px;
+  transition: width .25s ease, padding .25s ease;
 }
 
 .login-header {
@@ -38,4 +52,39 @@
 
 .login-button:hover {
   background-color: #10253f !important;
+}
+
+/* Reduce ligeramente tipografía y espacios para un look más compacto */
+.login-card h2.ant-typography {
+  font-size: 24px;
+}
+
+.login-form .ant-form-item { margin-bottom: 14px; }
+
+/* Two-column grid inside register form */
+.register-form .form-row { display: flex; gap: 18px; }
+.register-form .form-col { flex: 1; min-width: 0; }
+.register-form .ant-form-item { margin-bottom: 18px; }
+.register-form .ant-form-item:last-of-type { margin-bottom: 6px; }
+
+/* Extra breathing room above the register submit button */
+.register-form .register-submit { margin-top: 12px; }
+
+@media (max-width: 640px) {
+  .login-card.register-wide { width: 360px; padding: 24px 26px 26px; }
+  .register-form .form-row { flex-direction: column; gap: 0; }
+  .register-form .ant-form-item { margin-bottom: 16px; }
+}
+
+/* Ajusta el icono del cohete si existe esa clase */
+.login-logo {
+  font-size: 36px !important;
+  color: #1890ff;
+}
+
+@media (max-width: 480px) {
+  .login-card {
+    width: 92vw;
+    padding: 20px 16px;
+  }
 }

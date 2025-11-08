@@ -5,7 +5,6 @@ import {
   Button, 
   Space, 
   Tag, 
-  message, 
   Popconfirm, 
   Card, 
   Row, 
@@ -28,6 +27,9 @@ import {
   SaveOutlined,
   CloseOutlined
 } from '@ant-design/icons';
+import { toast } from 'react-toastify';
+import { userServices } from '../../../services/userServices';
+import { evaluationServices } from '../../../services/evaluationServices';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -48,51 +50,45 @@ const AdminTable = () => {
     loadData();
   }, []);
 
-  const loadData = () => {
+  const loadData = async () => {
     setLoading(true);
-    
-    // Cargar usuarios desde localStorage
-    const savedUsers = JSON.parse(localStorage.getItem('users') || '[]');
-    
-    // Si no hay usuarios, crear algunos de ejemplo
-    if (savedUsers.length === 0) {
-      const defaultUsers = [
-        {
-          id: 1,
-          name: 'Ana García',
-          email: 'ana@evaliq.com',
-          role: 'admin',
-          createdAt: new Date().toISOString(),
-          status: 'active'
-        },
-        {
-          id: 2,
-          name: 'Carlos López',
-          email: 'carlos@evaliq.com',
-          role: 'user',
-          createdAt: new Date().toISOString(),
-          status: 'active'
-        },
-        {
-          id: 3,
-          name: 'María Torres',
-          email: 'maria@evaliq.com',
-          role: 'user',
-          createdAt: new Date().toISOString(),
-          status: 'active'
-        }
-      ];
-      localStorage.setItem('users', JSON.stringify(defaultUsers));
-      setUsers(defaultUsers);
-    } else {
-      setUsers(savedUsers);
+    try {
+      // Usuarios reales
+      const u = await userServices.getUsers();
+      if (u?.success) {
+        const mappedUsers = (u.users || []).map(usr => ({
+          id: usr._id || usr.id,
+            name: usr.name,
+            email: usr.email,
+            role: usr.role,
+            createdAt: usr.createdAt || usr.updatedAt || new Date().toISOString(),
+            status: usr.estado === 'desactivado' ? 'inactive' : 'active'
+          }));
+        setUsers(mappedUsers);
+      } else {
+        toast.error(u?.error || 'Error obteniendo usuarios');
+      }
+      // Evaluaciones reales
+      const ev = await evaluationServices.list();
+      if (ev?.success) {
+        const mapped = (ev.items || []).map(e => ({
+          id: e._id || e.id,
+          projectName: e.projectName,
+          evaluator: e.evaluatorName || e.evaluatorEmail,
+          totalScore: e.totalScore,
+          comments: e.comments,
+          scores: e.scores || {},
+          date: e.createdAt
+        }));
+        setEvaluations(mapped);
+      } else {
+        toast.error(ev?.error || 'Error obteniendo evaluaciones');
+      }
+    } catch (e) {
+      toast.error('Error cargando datos');
+    } finally {
+      setLoading(false);
     }
-
-    // Cargar evaluaciones desde localStorage
-    const savedEvaluations = JSON.parse(localStorage.getItem('evaluations') || '[]');
-    setEvaluations(savedEvaluations);
-    
-    setLoading(false);
   };
 
   // Columnas para la tabla de usuarios
@@ -284,30 +280,34 @@ const AdminTable = () => {
       const values = await userForm.validateFields();
       
       if (editingUser) {
-        // Editar usuario existente
-        const updatedUsers = users.map(user => 
-          user.id === editingUser.id 
-            ? { ...user, ...values }
-            : user
-        );
-        setUsers(updatedUsers);
-        localStorage.setItem('users', JSON.stringify(updatedUsers));
-        message.success('Usuario actualizado correctamente');
-      } else {
-        // Agregar nuevo usuario
-        const newUser = {
-          id: Date.now(),
+        // Update user via API
+        const up = await userServices.updateUser(editingUser.id, { 
           name: values.name,
           email: values.email,
           role: values.role,
-          status: values.status,
-          createdAt: new Date().toISOString()
-        };
-        
-        const updatedUsers = [...users, newUser];
-        setUsers(updatedUsers);
-        localStorage.setItem('users', JSON.stringify(updatedUsers));
-        message.success('Usuario agregado correctamente');
+          estado: values.status === 'active' ? 'activo' : 'desactivado'
+        });
+        if (!up?.success) {
+          toast.error(up?.error || 'Error actualizando usuario');
+        } else {
+          toast.success('Usuario actualizado');
+          loadData();
+        }
+      } else {
+        // Create user (register) with password temporal
+        const tempPassword = 'Temp#' + Math.random().toString(36).slice(-6);
+        const reg = await userServices.register({
+          name: values.name,
+          email: values.email,
+          password: tempPassword,
+          skipPersist: true
+        });
+        if (!reg?.success) {
+          toast.error(reg?.error || 'Error creando usuario');
+        } else {
+          toast.success('Usuario creado (password temporal enviado)');
+          loadData();
+        }
       }
       
       setUserModalVisible(false);
@@ -327,7 +327,7 @@ const AdminTable = () => {
     );
     setUsers(updatedUsers);
     localStorage.setItem('users', JSON.stringify(updatedUsers));
-    message.success('Estado del usuario actualizado correctamente');
+    toast.success('Estado del usuario actualizado (local, recargar para reflejar real)');
   };
 
   const deleteUser = (userId) => {
@@ -337,14 +337,16 @@ const AdminTable = () => {
       evaluation => evaluation.evaluator !== userToDelete.name
     );
     
-    const updatedUsers = users.filter(user => user.id !== userId);
-    setUsers(updatedUsers);
-    setEvaluations(updatedEvaluations);
-    
-    localStorage.setItem('users', JSON.stringify(updatedUsers));
-    localStorage.setItem('evaluations', JSON.stringify(updatedEvaluations));
-    
-    message.success('Usuario eliminado correctamente');
+    // Llamar API para desactivar
+    (async () => {
+      const del = await userServices.deleteUser(userId);
+      if (!del?.success) {
+        toast.error(del?.error || 'Error desactivando usuario');
+        return;
+      }
+      toast.success('Usuario desactivado');
+      loadData();
+    })();
   };
 
   // Funciones CRUD para evaluaciones
@@ -373,23 +375,17 @@ const AdminTable = () => {
       const totalScore = Object.values(scores).reduce((sum, score) => sum + (score || 0), 0);
       
       if (viewingEvaluation) {
-        // Editar evaluación existente
-        const updatedEvaluation = {
-          ...viewingEvaluation,
+        const up = await evaluationServices.update(viewingEvaluation.id, {
           projectName,
-          evaluator,
-          totalScore,
           comments,
-          scores,
-          date: new Date().toISOString()
-        };
-        
-        const updatedEvaluations = evaluations.map(evaluation  => 
-          eval.id === viewingEvaluation.id ? updatedEvaluation : eval
-        );
-        setEvaluations(updatedEvaluations);
-        localStorage.setItem('evaluations', JSON.stringify(updatedEvaluations));
-        message.success('Evaluación actualizada correctamente');
+          scores
+        });
+        if (!up?.success) {
+          toast.error(up?.error || 'Error actualizando evaluación');
+        } else {
+          toast.success('Evaluación actualizada');
+          loadData();
+        }
       }
       
       setEvalModalVisible(false);
@@ -402,10 +398,15 @@ const AdminTable = () => {
   };
 
   const deleteEvaluation = (evaluationId) => {
-    const updatedEvaluations = evaluations.filter(evaluation => evaluation.id !== evaluationId);
-    setEvaluations(updatedEvaluations);
-    localStorage.setItem('evaluations', JSON.stringify(updatedEvaluations));
-    message.success('Evaluación eliminada correctamente');
+    (async () => {
+      const del = await evaluationServices.remove(evaluationId);
+      if (!del?.success) {
+        toast.error(del?.error || 'Error eliminando evaluación');
+        return;
+      }
+      toast.success('Evaluación eliminada');
+      loadData();
+    })();
   };
 
   // Estadísticas
@@ -655,7 +656,7 @@ const AdminTable = () => {
       >
         <Table
           columns={evaluationColumns}
-          dataSource={evaluations.map((evaluation, index) => ({ ...evaluation, key: index }))}
+          dataSource={evaluations.map((evaluation, index) => ({ ...evaluation, key: evaluation.id || index }))}
           loading={loading}
           pagination={{ pageSize: 10 }}
           scroll={{ x: 1000 }}
